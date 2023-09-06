@@ -1,0 +1,10 @@
+{
+    "tiempo": 1999,
+    "mostrar_percepcion": true, 
+    "player_init_pos": [10, 10],
+    "rango": 18,
+    "mapa": 1,
+    "cantidad_premios": 4,
+    "cantidad_pociones": 0,
+    "cantidad_relojes": 0
+}
