@@ -108,7 +108,6 @@ decide_action(Action, 'Quiero levantar una copa...'):-
 	
 % Si no tengo un plan guardado, busco uno nuevo.
 decide_action(Action, 'Avanzar con nuevo plan...'):-
-	write('entre en buscar plan del decideAction'),nl,
  	busqueda_plan(Plan, _Destino, _Costo),
 	Plan \= [],
 	obtenerMovimiento(Plan, Action, Resto),
@@ -149,8 +148,4 @@ busqueda_plan(Plan, Destino, Costo):-
  	retractall(esMeta(_)),
  	findall(Nodo, at(Nodo, copa, _), Metas), % nuevas metas
 											  %TO-DO extender trofeos, pocion, etc
-	write('En BusquedaPlan, cuyas metas son'), nl,
-	write(Metas),
-	write('jeje'),nl,
-	
  	buscar_plan_desplazamiento(Metas, Plan, Destino, Costo). % implementado en module_path_finding

@@ -2,9 +2,9 @@
     "tiempo": 1999,
     "mostrar_percepcion": true, 
     "player_init_pos": [10, 10],
-    "rango": 30,
+    "rango": 1,
     "mapa": 1,
-    "cantidad_premios": 20,
+    "cantidad_premios": 800,
     "cantidad_pociones": 0,
     "cantidad_relojes": 0
 }
