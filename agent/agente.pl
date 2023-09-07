@@ -87,27 +87,28 @@ decide_action(Action, 'Quiero levantar una copa...'):-
 
 
 % Me muevo a una posición vecina seleccionada de manera aleatoria.
-decide_action(Action, 'Me muevo a la posicion de al lado...'):-
-	at(MyNode, agente, me),
-	node(MyNode, _, _, _, AdyList),
-	length(AdyList, LenAdyList), LenAdyList > 0,
-	random_member([IdAdyNode, _CostAdyNode], AdyList),
-	!,
-	Action = avanzar(IdAdyNode).
+%decide_action(Action, 'Me muevo a la posicion de al lado...'):-
+%	at(MyNode, agente, me),
+%	node(MyNode, _, _, _, AdyList),
+%	length(AdyList, LenAdyList), LenAdyList > 0,
+%	random_member([IdAdyNode, _CostAdyNode], AdyList),
+%	!,
+%	Action = avanzar(IdAdyNode).
 
 % Si tengo un plan de movimientos, ejecuto la siguiente acción.
-decide_action(Action, 'Avanzar...'):-
-	plandesplazamiento(Plan),
-	length(Plan, LargoPlan),
-	LargoPlan > 0,
-	!,
-	obtenerMovimiento(Plan, Destino, Resto),
-	retractall(plandesplazamiento(_)),
-	assert(plandesplazamiento(Resto)),
-	Action = Destino.
+%decide_action(Action, 'Avanzar...'):-
+%	plandesplazamiento(Plan),
+%	length(Plan, LargoPlan),
+%	LargoPlan > 0,
+%	!,
+%	obtenerMovimiento(Plan, Destino, Resto),
+%	retractall(plandesplazamiento(_)),
+%	assert(plandesplazamiento(Resto)),
+%	Action = Destino.
 	
 % Si no tengo un plan guardado, busco uno nuevo.
 decide_action(Action, 'Avanzar con nuevo plan...'):-
+	write('entre en buscar plan del decideAction'),nl,
  	busqueda_plan(Plan, _Destino, _Costo),
 	Plan \= [],
 	obtenerMovimiento(Plan, Action, Resto),
@@ -148,5 +149,8 @@ busqueda_plan(Plan, Destino, Costo):-
  	retractall(esMeta(_)),
  	findall(Nodo, at(Nodo, copa, _), Metas), % nuevas metas
 											  %TO-DO extender trofeos, pocion, etc
-
+	write('En BusquedaPlan, cuyas metas son'), nl,
+	write(Metas),
+	write('jeje'),nl,
+	
  	buscar_plan_desplazamiento(Metas, Plan, Destino, Costo). % implementado en module_path_finding

@@ -67,10 +67,12 @@ buscar_plan_desplazamiento(Metas, Plan, Destino, Costo):-
 	forall(member(Meta, Metas), assert(esMeta(Meta))),
 	at(MyNode, agente, me),
 	length(Metas, CantMetas),
+	write('cantidad de metas son:'), write(CantMetas),nl,
 	CantMetas > 0,
 	!,
 	retractall(raiz(_)),
 	assert(raiz(MyNode)),
+	write('voy a entrar a buscarEstrella'),
 	buscarEstrella([[MyNode, 0]], Metas, Camino, Costo, Destino),
 	crearPlan(Camino, Plan).
 	
@@ -109,9 +111,13 @@ buscarEstrella(Frontera, Metas, Camino, Costo, Destino):-
 % y llama recursivmaente con la nueva frontera.
 	
 buscar(Frontera, _, _M, Nodo):-
-	write('Entre casobase'),nl,
+	
+	write('Entre casobase del buscar'),nl,
 	seleccionar([Nodo, _], Frontera, _),
+	write('Entre casobase del buscar1'),nl,
 	esMeta(Nodo),
+	write('Entre casobase del buscar2'),nl,
+	write('Es META'),nl,
 	!.
 
 buscar(Frontera, Visitados, Metas, MM):-
@@ -119,9 +125,10 @@ buscar(Frontera, Visitados, Metas, MM):-
 	seleccionar(Nodo, Frontera, FronteraSinNodo), % selecciona primer nodo de la frontera
 	generarVecinos(Nodo, Vecinos), % genera los vecinos del nodo -
 	agregarAVisitados(Nodo, Visitados, NuevosVisitados), % agrega el nodo a lista de visitados
+	write('LA LISTA VISITADOS EN PREDICADO BUSCAR TIENE'), 
+	write (NuevosVisitados), nl,
 	agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas), % agrega vecinos a la frontera - TO-DO
 	buscar(NuevaFrontera, NuevosVisitados, Metas, MM). % continua la busqueda con la nueva frontera
-%	agregar(FronteraSinNodo, Vecinos, -ret NuevaFrontera, -ret NuevosVisitados, Nodo, Metas), % agrega vecinos a la frontera - TO-DO
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%	
 %
@@ -184,40 +191,73 @@ retrieveNodoFromList(Id, [_ | Resto], CostNodo) :- % Si no encontramos el nodo, 
 
 retrieveNodoFromList(_, [], _). % Caso base: Si la lista está vacía, no se encuentra el nodo.
 
+calcularFenFrontera([], Meta, _).
+calcularFenFrontera([ [IDNodo,CostoAcumulado] | RestoLista] , Meta, FronteraConFCalculado):-
+	calcularH([IDNodo,CostoAcumulado], Meta, Resultado),
+	NuevoCosto is CostoAcumulado+Resultado,
+    calcularFenFrontera(RestoLista, Meta, RestoFrontera),
+    FronteraConFCalculado = [[IDNodo, NuevoCosto] | RestoFrontera].
 
+cheaper(>,[_,C1],[_,C2]) :-
+        C1>C2.
 
+cheaper(<, [_,C1],[_,C2]) :-
+        C1=<C2.
 
  % agrega vecinos a la frontera - TO-DO
  % luego, ordenar con pred
-agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas):-
+ %TO-DO Si agrego vecino a frontera, tengo que agregar Nodo que es el "padre" (El nodo predecesor).
+agregar(FronteraSinNodo,[], NuevaFrontera, NuevosVisitados, Nodo, Metas):-
+	NuevaFrontera= FronteraSinNodo,
+	NuevosVisitados= Visitados.
+
+agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, NodoPadre, Metas):-
+	write('entre al agregar'),nl,
 	Vecinos= [Cabeza | Cola],
-	agregarAux(Cabeza),
-	agregar(FronteraSinNodo, Cola, NuevaFrontera,NuevosVisitados,Nodo,Metas).
+		write('entre al agregar1'),nl,
+	agregarAux(FronteraSinNodo, Vecinos,Cabeza, NuevaFrontera, NuevosVisitados, Nodo, Metas),
+		write('entre al agregar2'),nl,
+	agregar(FronteraSinNodo, Cola, NuevaFrontera,NuevosVisitados,NodoPadre,Metas),
+	write('entre al agregar3'),nl,
+	calcularFenFrontera(NuevaFrontera, FronteraConFCalculado), %Para cada nodo de la frontera, su costo será la funcion F(N) (i.e costo acumulado + euristica)
+	write('entre al agregar4'),nl,
+	predsort(cheaper, FronteraConFCalculado, FronteraOrdenada), %ordeno la frontera de menor a mayor por costo,
+	write('entre al agregar5'),nl.
 
-agregarAux(Cabeza):- %si vecino pertenece a frontera actual
-	Vecinos= [Cabeza | Cola],
-	Cabeza= [Id, Costo],
-	member([Id,_] , FronteraSinNodo),
-	retrieveNodoFromList(Id, FronteraSinNodo, NodoViejo),
-	NodoViejo= [IDNodo, CostoViejoNodo]
-	CostoViejoNodo>Costo, 
-	delete()
-	%reemplazar VecinoViejo por VecinoNuevo en frontera
-	
-agregarAux(Cabeza):- %si vecino pertenece a visitados
-	Vecinos= [Cabeza | Cola],
-	Cabeza= [Id,Costo],
-	node(Id,_,_,_,_),
-	retrieveNodoFromList(Id, FronteraSinNodo, CostoViejo),
-	q
-	CostoViejo>Costo,
-	% ???
+agregarAux(FronteraSinNodo, Vecinos,NodoVecinosActual, NuevaFrontera, NuevosVisitados, Nodo, Metas):- %si vecino pertenece a frontera actual
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1%%%%%%%%%%%%%%%%'),nl,
+	NodoVecinosActual= [Id, Costo],
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1 UNO %%%%%%%%%%%%%%%%'),nl,
+	member([Id,CostoNodoViejo] , FronteraSinNodo),
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1 DOS %%%%%%%%%%%%%%%%'),nl,
+	CostoNodoViejo>=Costo, 
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1 tres %%%%%%%%%%%%%%%%'),nl,
+	delete(FronteraSinNodo, NodoViejo, NuevaFrontera), 
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1 cua %%%%%%%%%%%%%%%%'),nl,
 
-agregarAux(Cabeza):- %si el vecino es nuevo
-	Vecinos= [Cabeza| Cola],
-	%agregar vecino a frontera
+   	append(FronteraNuevaAux, NodoVecinosActual, NuevaFrontera).	
+
+agregarAux(FronteraSinNodo, Vecinos,NodoVecinosActual, NuevaFrontera, NuevosVisitados, NodoPadre, Metas):- %si vecino pertenece a visitados
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2 %%%%%%%%%%%%%%%%'),nl,
+	NodoVecinosActual= [Id,Costo],
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2 UNO %%%%%%%%%%%%%%%%'),nl,
+	member([Id,CostoViejo],Visitados),
+	write('la Lsita Visitados es'), write(Visitados), nl,
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2 DOS %%%%%%%%%%%%%%%%'),nl,
+	write('CostoViejo es'), write(CostoViejo), nl,
+	write('CostoActual es'), write(Costo),nl,
+	CostoViejo>=Costo,
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2 CINCO %%%%%%%%%%%%%%%%'),nl,
+	delete(Vecinos, NodoCostoViejo, NuevosVisitados),
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2 SEIS %%%%%%%%%%%%%%%%'),nl,
+	append(FronteraSinNodo,Cabeza, NuevaFrontera),
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2 SIETE %%%%%%%%%%%%%%%%'),nl.
 
 
-% Predicado para ordenar la lista de vecinos por costo.
-ordenarPorCosto(VecinosNoOrdenados, VecinosOrdenados) :-
-    predsort(compararPorCosto, VecinosNoOrdenados, VecinosOrdenados).
+
+
+
+agregarAux(FronteraSinNodo, Vecinos,NodoVecinosActual, NuevaFrontera, NuevosVisitados, Nodo, Metas):- %si el vecino es nuevo lo agrego a la frontera
+	write('ENTRE AL CASO EN EL QUE EL VECINO ES NEUVO Y LO AGREGO A LA FRONTERA '),
+	append(fronteraSinNodo,NodoVecinosActual, NuevaFrontera).
+
