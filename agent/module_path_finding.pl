@@ -219,40 +219,60 @@ agregar(FronteraSinNodo,[], NuevaFrontera, _, NodoPadre, _):-
 	%NuevosVisitados= Visitados.
 
 agregar(FronteraSinNodo, Vecinos, NuevaFrontera, Visitados, NodoPadre, Metas):-
+	write('entre al agregar'),nl,
 	Vecinos= [Cabeza | Cola],
+	write(' La lista VECINOS tiene: '), write(Vecinos),nl,
 	agregarAux(FronteraSinNodo,Cabeza, NuevaFronteraAux, Visitados, NodoPadre, Metas),
+	write('mi nueva Frontera en el metodo Agregar es: '), write(NuevaFronteraAux),nl,
+	write('entre al agregar2'),nl,
 	agregar(NuevaFronteraAux, Cola, NuevaFrontera,Visitados,NodoPadre,Metas),
+	write('entre al agregar3'),nl,
 	%calcularFenFrontera(NuevaFrontera,Metas,FronteraConFCalculado), %Para cada nodo de la frontera, su costo será la funcion F(N) (i.e costo acumulado + euristica)
+	write('entre al agregar4'),nl,
 	%predsort(cheaper, FronteraConFCalculado, FronteraOrdenada), %ordeno la frontera de menor a mayor por costo,
 	write('entre al agregar5'),nl.
 
 agregarAux(FronteraSinNodo,NodoVecinosActual, NuevaFrontera, NuevosVisitados, NodoPadre, Metas):- %si vecino pertenece a frontera actual y CostoViejo MayorIgual CostoNuevo
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1%%%%%%%%%%%%%%%%'),nl,
 	NodoVecinosActual= [Id, Costo],
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1 UNO %%%%%%%%%%%%%%%%'),nl,
 	member([Id,CostoNodoViejo] , FronteraSinNodo),
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1 DOS %%%%%%%%%%%%%%%%'),nl,
 	CostoNodoViejo>=Costo, 
-	write('%si vecino pertenece a frontera actual y CostoViejo MayorIgual CostoNuevo'), nl,
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1 tres %%%%%%%%%%%%%%%%'),nl,
 	delete(FronteraSinNodo,[Id,CostoNodoViejo], FronteraNuevaAux), 
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 1 cua %%%%%%%%%%%%%%%%'),nl,
    	append(FronteraNuevaAux, NodoVecinosActual, NuevaFrontera).	
 
 agregarAux(FronteraSinNodo,NodoVecinosActual, NuevaFrontera, NuevosVisitados, NodoPadre, Metas):- %si vecino pertenece a frontera actual y CostoViejo menor CostoNuevo
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2%%%%%%%%%%%%%%%%'),nl,
 	NodoVecinosActual= [Id, Costo],
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2 UNO %%%%%%%%%%%%%%%%'),nl,
 	member([Id,CostoNodoViejo], FronteraSinNodo),
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 2 DOS %%%%%%%%%%%%%%%%'),nl,
 	CostoNodoViejo<Costo, 
-	write(' ENTRE CASO si vecino pertenece a frontera actual y CostoViejo menor CostoNuevo'), nl,
 	NuevaFrontera= FronteraSinNodo.
 
 agregarAux(FronteraSinNodo,NodoVecinosActual, NuevaFrontera, NuevosVisitados, NodoPadre, Metas):- %si vecino pertenece a visitados y CostoViejo mayor CostoActual
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 3 %%%%%%%%%%%%%%%%'),nl,
 	NodoVecinosActual= [Id,Costo],
+	%write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 3 UNO %%%%%%%%%%%%%%%%'),nl,
 	member([Id,CostoViejo],NuevosVisitados),
+	write('la Lsita Visitados es'), write(NuevosVisitados), nl,
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 3 DOS %%%%%%%%%%%%%%%%'),nl,
+	write('CostoViejo es'), write(CostoViejo), nl,
+	write('CostoActual es'), write(Costo),nl,
 	CostoViejo>=Costo,
-	write(' ENTRE CASO si vecino pertenece a visitados y CostoViejo mayor CostoActual'), nl,
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 3 CINCO %%%%%%%%%%%%%%%%'),nl,
 	delete(NuevosVisitados, NodoCostoViejo, NuevosVisitadosAux),
-	append(NuevosVisitadosAux,NodoVecinosActual, NuevosVisitados).
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 3 SEIS %%%%%%%%%%%%%%%%'),nl,
+	append(NuevosVisitadosAux,NodoVecinosActual, NuevosVisitados),
+	write('%%%%%%%%%%%%%%%%%%%%%%%%%%%entre al agregarAUX CASO 3 SIETE %%%%%%%%%%%%%%%%'),nl.
 
 agregarAux(FronteraSinNodo,NodoVecinosActual, NuevaFrontera, NuevosVisitados, NodoPadre, Metas):- %si vecino pertenece a visitados y CostoViejo menor CostoActual
 NodoVecinosActual= [Id,Costo],
 	member([Id,CostoViejo],NuevosVisitados),
-	write('Entre VECINO PERTENECE A VISITADOS Y COSTO VIEJO ES MENOR A COSTO ACTUAL'),nl,
+	write('Entre Caso 4'),nl,
 	CostoViejo<Costo,
 	NuevaFrontera= FronteraSinNodo.
 

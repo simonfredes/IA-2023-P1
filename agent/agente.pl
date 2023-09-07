@@ -96,15 +96,15 @@ decide_action(Action, 'Quiero levantar una copa...'):-
 %	Action = avanzar(IdAdyNode).
 
 % Si tengo un plan de movimientos, ejecuto la siguiente acción.
-%decide_action(Action, 'Avanzar...'):-
-%	plandesplazamiento(Plan),
-%	length(Plan, LargoPlan),
-%	LargoPlan > 0,
-%	!,
-%	obtenerMovimiento(Plan, Destino, Resto),
-%	retractall(plandesplazamiento(_)),
-%	assert(plandesplazamiento(Resto)),
-%	Action = Destino.
+decide_action(Action, 'Avanzar...'):-
+	plandesplazamiento(Plan),
+	length(Plan, LargoPlan),
+	LargoPlan > 0,
+	!,
+	obtenerMovimiento(Plan, Destino, Resto),
+	retractall(plandesplazamiento(_)),
+	assert(plandesplazamiento(Resto)),
+	Action = Destino.
 	
 % Si no tengo un plan guardado, busco uno nuevo.
 decide_action(Action, 'Avanzar con nuevo plan...'):-
