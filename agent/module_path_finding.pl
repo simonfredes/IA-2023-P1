@@ -126,7 +126,7 @@ buscar(Frontera, Visitados, Metas, MM):-
 	generarVecinos(Nodo, Vecinos), % genera los vecinos del nodo -
 	agregarAVisitados(Nodo, Visitados, NuevosVisitados), % agrega el nodo a lista de visitados
 	write('LA LISTA VISITADOS EN PREDICADO BUSCAR TIENE'), 
-	write (NuevosVisitados), nl,
+	write(NuevosVisitados), nl,
 	agregar(FronteraSinNodo, Vecinos, NuevaFrontera, NuevosVisitados, Nodo, Metas), % agrega vecinos a la frontera - TO-DO
 	buscar(NuevaFrontera, NuevosVisitados, Metas, MM). % continua la busqueda con la nueva frontera
 
