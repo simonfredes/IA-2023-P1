@@ -95,7 +95,7 @@ decide_action(Action, 'Quiero levantar una copa...'):-
 %	!,
 %	Action = avanzar(IdAdyNode).
 
-% Si tengo un plan de movimientos, ejecuto la siguiente acción.
+ %Si tengo un plan de movimientos, ejecuto la siguiente acción.
 decide_action(Action, 'Avanzar...'):-
 	plandesplazamiento(Plan),
 	length(Plan, LargoPlan),
