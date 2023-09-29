@@ -115,10 +115,10 @@ buscar(Frontera, _, _M, Nodo):-
 
 buscar(Frontera, Visitados, Metas, MM):-
 	seleccionar(Nodo, Frontera, FronteraSinNodo), % selecciona primer nodo de la frontera
-	generarVecinos(Nodo, Vecinos), 	% genera los vecinos del nodo - TO-DO
+	generarVecinos(Nodo, Vecinos), 	% genera los vecinos del nodo
 	agregarAVisitados(Nodo, Visitados, NuevosVisitados), % agrega el nodo a lista de visitados
-	agregar(Vecinos, Nodo, Metas, FronteraSinNodo, NuevosVisitados, NuevaFrontera, NuevosVisitadosAux),  % agrega vecinos a la frontera - TO-DO
-	quick_sort(NuevaFrontera, Metas, NuevaFronteraAux),
+	agregar(Vecinos, Nodo, Metas, FronteraSinNodo, NuevosVisitados, NuevaFrontera, NuevosVisitadosAux),  % agrega vecinos a la frontera 
+	ordenar(NuevaFrontera, Metas, NuevaFronteraAux),
 	buscar(NuevaFronteraAux, NuevosVisitadosAux, Metas, MM). % continua la busqueda con la nueva frontera
 
 
@@ -262,14 +262,8 @@ distance([X1, Y1], [X2, Y2], Distance):-
 	Distance is sqrt(DX^2 + DY^2).
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% calcularF(+Nodo, +Metas, -F).
-%
-% calcula el valor minimo para F segun la meta mas cercana a un nodo.
-%
-%
 
+% Obtiene la meta mas cercana al nodo.
 calcularF(Nodo, Metas, F):-
 	Nodo = [IdNodo, Costo],
     findall(CostoH, (member(Meta, Metas), calcularH(IdNodo, Meta, CostoH)), TodasLasH),
@@ -277,14 +271,7 @@ calcularF(Nodo, Metas, F):-
  	F is H + Costo.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% obtenerMin(+Lista, -Min).
-%
 % Recupera el menor elemento de una lista
-%
-%
-
 obtenerMin([X], X).
 obtenerMin([X, Y|Xs], Salida):-
 	X < Y, 
@@ -295,20 +282,13 @@ obtenerMin([X, Y|Xs], Salida):-
 	obtenerMin([Y|Xs], Salida).
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% quick_sort(+Lista, +Metas, -ListaOrdenada).
-%
-% Predicado de ordenamiento.
-% Recibe una lista a ordenar y la lista con todas las metas y devuelve la lista ordenada.
-%
-%
 
-quick_sort([], _, []).
-quick_sort([H|T], Metas, Sorted):-
+
+ordenar([], _, []).
+ordenar([H|T], Metas, Sorted):-
 	pivoting(H,T, Metas, L1,L2),
-	quick_sort(L1, Metas, Sorted1),
-	quick_sort(L2, Metas, Sorted2),
+	ordenar(L1, Metas, Sorted1),
+	ordenar(L2, Metas, Sorted2),
 	append(Sorted1,[H|Sorted2], Sorted).
    
 
@@ -319,8 +299,11 @@ pivoting(H,[X|T], Metas, [X|L], G):-
 	Fx =< Fh,
 	!,
 	pivoting(H,T, Metas, L, G).
+
 pivoting(H,[X|T], Metas, L, [X|G]):-
 	calcularF(H, Metas, Fh),
 	calcularF(X, Metas, Fx),
 	Fx > Fh,
 	pivoting(H,T, Metas, L,G).
+
+
